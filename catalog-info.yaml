@@ -6,8 +6,8 @@ metadata:
   metadata:
     annotations:
       backstage.io/dockerfile: ./Dockerfile
-      backstage.io/docker-image-repo: <docker-image-repository-url>
+      backstage.io/techdocs-ref: value
 spec:
   type: service
   lifecycle: experimental
-  owner: your-team-name
+  owner: my-team
