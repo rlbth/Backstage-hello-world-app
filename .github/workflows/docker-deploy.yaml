@@ -21,6 +21,6 @@ jobs:
           docker push lakran/hello-world-app
 
       # Add steps for deployment (localhost in this case - runs the bash script)
-      - name: Deploy to Local Server
-        run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@local-server-ip 'bash -s' < deploy-local.sh
+#      - name: Deploy to Local Server
+#        run: |
+#          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@local-server-ip 'bash -s' < deploy-local.sh
