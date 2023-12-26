@@ -6,7 +6,7 @@ metadata:
   annotations:
     backstage.io/dockerfile: ./Dockerfile
     backstage.io/techdocs-ref: value
-    github.com/project-slug: backstage/backstage
+    github.com/project-slug: rlbth/Backstage-hello-world-app
 spec:
   type: service
   lifecycle: experimental
