@@ -3,11 +3,10 @@ kind: Component
 metadata:
   name: hello-world-app
   description: "A simple Hello World application with Docker"
-  metadata:
-    annotations:
-      backstage.io/dockerfile: ./Dockerfile
-      backstage.io/techdocs-ref: value
-      github.com/project-slug: backstage/backstage
+  annotations:
+    backstage.io/dockerfile: ./Dockerfile
+    backstage.io/techdocs-ref: value
+    github.com/project-slug: backstage/backstage
 spec:
   type: service
   lifecycle: experimental
