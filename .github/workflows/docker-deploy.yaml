@@ -1,10 +1,10 @@
 name: Docker Build and Deploy with CloudFormation
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["Workflow for Linting and testing the app"]
+    types: 
+      - completed
 
 jobs:
   build-and-deploy:
