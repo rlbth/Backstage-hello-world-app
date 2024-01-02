@@ -1,18 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: ECS Deployment for Flask Application with Application Load Balancer
 
-Mappings:
-  AccountConfig:
-    VpcId: vpc-0545e3b7896f716b9
-    subnet1: subnet-0756b95d66b60dcb0
-    subnet2: subnet-0db15b77b0afcbcaf
+Parameters:
+  DefaultVpcId:
+    Description: To use existing VPC ID, since VPC creation is not allowd in sandboxes
+    Type: String
+    Default: vpc-0545e3b7896f716b9
+
+  DefaultSubnet1:
+    Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
+    Type: String
+    Default: subnet-0756b95d66b60dcb0
+
+  DefaultSubnet2:
+    Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
+    Type: String
+    Default: subnet-0db15b77b0afcbcaf
+
 
 Resources:
   LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Load Balancer
-      VpcId: !FindInMap [AccountConfig, VpcId]
+      VpcId: !Ref DefaultVpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -23,7 +34,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Flask application
-      VpcId: !FindInMap [AccountConfig, VpcId]
+      VpcId: !Ref DefaultVpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 5000
@@ -35,8 +46,8 @@ Resources:
     Properties:
       Type: 'application'
       Subnets:
-        - !FindInMap [AccountConfig, subnet1]
-        - !FindInMap [AccountConfig, subnet2]
+        - !Ref DefaultSubnet1
+        - !Ref DefaultSubnet2
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
 
@@ -58,7 +69,7 @@ Resources:
     Properties:
       Port: 5000
       Protocol: HTTP
-      VpcId: !FindInMap [AccountConfig, VpcId]
+      VpcId: !Ref DefaultVpcId
       TargetType: 'ip'
       HealthCheckPath: '/trucks'  
       HealthCheckProtocol: HTTP
@@ -117,8 +128,8 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           Subnets:
-            - !FindInMap [AccountConfig, subnet1]
-            - !FindInMap [AccountConfig, subnet2]
+            - !Ref DefaultSubnet1
+            - !Ref DefaultSubnet2
           SecurityGroups:
             - !Ref FlaskAppSecurityGroup
 
