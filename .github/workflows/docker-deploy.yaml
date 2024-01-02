@@ -1,4 +1,5 @@
-name: Docker Build and Deploy
+name: Docker Build and Deploy with CloudFormation
+
 on:
   push:
     branches: [ main ]
@@ -14,33 +15,50 @@ jobs:
       - name: Build Docker image
         run: docker build -t lakran/hello-truck .
 
-      # If pushing to Docker Hub
       - name: Push to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push lakran/hello-truck
 
+      - name: Deploy CloudFormation Stack for S3 Bucket
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        id: deploy-s3-bucket
+        with:
+          name: my-s3-bucket-stack
+          template: ./infrastructure/s3-bucket-template.yaml
+          parameter-overrides: BucketName=hello-truck-${{ github.run_id }}
+          capabilities: CAPABILITY_NAMED_IAM
+          no-fail-on-empty-changeset: '1'
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Print S3 Bucket Name
+        run: echo "S3 Bucket Name: ${{ steps.deploy-s3-bucket.outputs.BucketName }}"
+
       - name: Upload CloudFormation Template to S3
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks
-          bucket: ${{ secrets.S3_BUCKET_NAME }}
+          bucket: ${{ steps.deploy-s3-bucket.outputs.BucketName }}
           source: ./infrastructure/deployment-cft.yaml
-          path: infrastructure/deployment-cft.yaml
+          path: deployment-cft.yaml
         env:
-          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: 'us-east-1'
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Deploy CloudFormation Template
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: hello-truck-stack
-          template: ./infrastructure/deployment-cft.yaml
-          parameter-overrides: >-
-            DockerHubUsername=${{ secrets.DOCKER_USERNAME }}
-            DockerHubPassword=${{ secrets.DOCKER_PASSWORD }}
-            DockerImage=lakran/hello-truck:latest
+          template: s3://${{ steps.deploy-s3-bucket.outputs.BucketName }}/deployment-cft.yaml
           capabilities: CAPABILITY_NAMED_IAM
           no-fail-on-empty-changeset: '1'
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
