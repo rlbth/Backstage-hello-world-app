@@ -1,3 +1,4 @@
+[![LintAndTest](https://github.com/rlbth/Backstage-hello-world-app/actions/workflows/linting-testing.yaml/badge.svg)](https://github.com/rlbth/Backstage-hello-world-app/actions/workflows/linting-testing.yaml)
 # Application Integration with Backstage
 
 This document contains the paper solution (concept) and blue print for priliminary implimentation involved in the automated build, test, and deployment of our "hello-world" app through backstage.
