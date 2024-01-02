@@ -3,9 +3,9 @@ Description: ECS Deployment for Flask Application with Application Load Balancer
 
 Mappings:
   AccountConfig:
-    VpcId: vpc-0bbcb12a13546c535
-    subnet1: subnet-0837671eb8a0832d1
-    subnet2: subnet-0b89317172db5dbf9
+    VpcId: vpc-0545e3b7896f716b9
+    subnet1: subnet-0756b95d66b60dcb0
+    subnet2: subnet-0db15b77b0afcbcaf
 
 Resources:
   LoadBalancerSecurityGroup:
