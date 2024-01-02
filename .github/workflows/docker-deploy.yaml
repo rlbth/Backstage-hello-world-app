@@ -48,7 +48,7 @@ jobs:
 
       - name: Upload CloudFormation Template to S3
         run: |
-          aws s3 cp ./infrastructure/deployment-cft.yaml s3://${{BUCKET_NAME}}/deployment-cft.yaml
+          aws s3 cp ./infrastructure/deployment-cft.yaml s3://${{ BUCKET_NAME }}/deployment-cft.yaml
         env:
           BUCKET_NAME: ${{ steps.deploy-s3-bucket.outputs.BucketName }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
