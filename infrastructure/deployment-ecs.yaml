@@ -1,12 +1,18 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: ECS Deployment for Flask Application with Application Load Balancer
 
+Mappings:
+  AccountConfig:
+    VpcId: vpc-0bbcb12a13546c535
+    subnet1: subnet-0837671eb8a0832d1
+    subnet2: subnet-0b89317172db5dbf9
+
 Resources:
   LoadBalancerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Load Balancer
-      VpcId: vpc-0d0d46b20f75fa7a5
+      VpcId: !FindInMap [AccountConfig, VpcId]
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -17,7 +23,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Flask application
-      VpcId: vpc-0d0d46b20f75fa7a5
+      VpcId: !FindInMap [AccountConfig, VpcId]
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 5000
@@ -29,8 +35,8 @@ Resources:
     Properties:
       Type: 'application'
       Subnets:
-        - subnet-0176df1685b05e731
-        - subnet-05f6cdf681e72aba8
+        - !FindInMap [AccountConfig, subnet1]
+        - !FindInMap [AccountConfig, subnet2]
       SecurityGroups:
         - !Ref LoadBalancerSecurityGroup
 
@@ -52,7 +58,7 @@ Resources:
     Properties:
       Port: 5000
       Protocol: HTTP
-      VpcId: vpc-0d0d46b20f75fa7a5
+      VpcId: !FindInMap [AccountConfig, VpcId]
       TargetType: 'ip'
       HealthCheckPath: '/trucks'  
       HealthCheckProtocol: HTTP
@@ -111,8 +117,8 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           Subnets:
-            - subnet-0176df1685b05e731
-            - subnet-05f6cdf681e72aba8
+            - !FindInMap [AccountConfig, subnet1]
+            - !FindInMap [AccountConfig, subnet2]
           SecurityGroups:
             - !Ref FlaskAppSecurityGroup
 
