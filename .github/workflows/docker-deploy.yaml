@@ -25,7 +25,7 @@ jobs:
         run: |
           aws cloudformation deploy \
             --template-file ./infrastructure/s3-bucket-template.yaml \
-            --stack-name my-s3-bucket-stack \
+            --stack-name my-s3-bucket-stack-1 \
             --parameter-overrides BucketName=hello-truck-${{ github.run_id }} \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset
