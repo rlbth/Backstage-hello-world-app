@@ -1,14 +1,15 @@
-name: Docker Build and Deploy with CloudFormation
+name: BuildAndDeploy
 
 on:
   workflow_run:
-    workflows: ["Workflow for Linting and testing the app"]
+    workflows: ["LintAndTest"]
     types: 
       - completed
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
 
