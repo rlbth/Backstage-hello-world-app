@@ -1,13 +1,13 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: hello-world-app
-  description: "A simple Hello World application with Docker"
-  annotations:
-    backstage.io/dockerfile: ./Dockerfile
-    backstage.io/techdocs-ref: value
-    github.com/project-slug: rlbth/Backstage-hello-world-app
+  name: hello-truck
+  description: "A simple truck leasing hello world app"
+  metadata:
+    annotations:
+      backstage.io/dockerfile: ./Dockerfile
+      backstage.io/techdocs-ref: value
 spec:
   type: service
   lifecycle: experimental
-  owner: my-team
+  owner: lakran
