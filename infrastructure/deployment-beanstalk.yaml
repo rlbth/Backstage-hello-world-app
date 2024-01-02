@@ -2,6 +2,27 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Deployment for Hello Truck Application in Elastic Beanstalk
 
 Resources:
+  EBInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: 
+        - !Ref EBInstanceRole
+
+  EBInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ec2.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: "/"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier
+  
+
   EBApplication:
     Type: AWS::ElasticBeanstalk::Application
     Properties:
@@ -13,7 +34,7 @@ Resources:
     Properties:
       ApplicationName: !Ref EBApplication
       EnvironmentName: HelloTruckEnvironment
-      SolutionStackName: "64bit Amazon Linux 2 v3.3.8 running Docker"
+      SolutionStackName: "64bit Amazon Linux 2023 v4.1.2 running Docker"
       OptionSettings:
         - Namespace: aws:elasticbeanstalk:environment
           OptionName: EnvironmentType
@@ -24,6 +45,12 @@ Resources:
         - Namespace: aws:elasticbeanstalk:application:environment
           OptionName: PORT
           Value: "5000"
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref EBInstanceProfile
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: IamInstanceProfile
+          Value: !Ref EBInstanceProfile
 
 Outputs:
   EBEnvironmentURL:

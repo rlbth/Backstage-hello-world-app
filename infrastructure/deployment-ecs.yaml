@@ -1,0 +1,159 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ECS Deployment for Flask Application with Application Load Balancer
+
+Parameters:
+  DefaultVpcId:
+    Description: To use existing VPC ID, since VPC creation is not allowd in sandboxes
+    Type: String
+    Default: vpc-0545e3b7896f716b9
+
+  DefaultSubnet1:
+    Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
+    Type: String
+    Default: subnet-0756b95d66b60dcb0
+
+  DefaultSubnet2:
+    Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
+    Type: String
+    Default: subnet-0db15b77b0afcbcaf
+
+
+Resources:
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Load Balancer
+      VpcId: !Ref DefaultVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  FlaskAppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Flask application
+      VpcId: !Ref DefaultVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Type: 'application'
+      Subnets:
+        - !Ref DefaultSubnet1
+        - !Ref DefaultSubnet2
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+
+  Listener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: 'forward'
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+    DependsOn:
+      - LoadBalancer
+      - TargetGroup
+
+  TargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 5000
+      Protocol: HTTP
+      VpcId: !Ref DefaultVpcId
+      TargetType: 'ip'
+      HealthCheckPath: '/trucks'  
+      HealthCheckProtocol: HTTP
+    DependsOn: LoadBalancer
+
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/hello-truck
+      RetentionInDays: 7
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: HelloTruckCluster1
+
+  ECSTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: hello-truck-task-1
+      Cpu: "256"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSExecutionRole
+      ContainerDefinitions:
+        - Name: hello-truck-container-1
+          Image: lakran/hello-truck:latest
+          Cpu: 256
+          Memory: 512
+          Essential: true
+          PortMappings:
+            - ContainerPort: 5000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/hello-truck
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: ECSTaskDefinition
+    Properties:
+      ServiceName: HelloTruckService-1
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref ECSTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      LoadBalancers:
+        - ContainerName: hello-truck-container-1
+          ContainerPort: 5000
+          TargetGroupArn: !Ref TargetGroup
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !Ref DefaultSubnet1
+            - !Ref DefaultSubnet2
+          SecurityGroups:
+            - !Ref FlaskAppSecurityGroup
+
+  ECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: [ecs-tasks.amazonaws.com]
+            Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+        - PolicyName: ECSExecutionPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:*
+                  - ecr:*
+                  - logs:*
+                  - ec2:*
+                Resource: '*'
+
