@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deployment for Hello Truck Application in Elastic Beanstalk
+
+Resources:
+  EBApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: HelloTruckApplication
+      Description: Elastic Beanstalk Application running a Docker container of hello truck
+
+  EBEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref EBApplication
+      EnvironmentName: HelloTruckEnvironment
+      SolutionStackName: "64bit Amazon Linux 2 v3.3.8 running Docker"
+      OptionSettings:
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: EnvironmentType
+          Value: SingleInstance
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: DOCKER_IMAGE
+          Value: "lakran/hello-truck:latest"
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: PORT
+          Value: "5000"
+
+Outputs:
+  EBEnvironmentURL:
+    Description: URL of the Elastic Beanstalk Environment
+    Value: !GetAtt EBEnvironment.EndpointURL

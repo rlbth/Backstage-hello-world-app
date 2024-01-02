@@ -12,14 +12,31 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build Docker image
-        run: docker build -t hello-world-app .
+        run: docker build -t hello-truck .
 
       # If pushing to Docker Hub
       - name: Push to Docker Hub
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push hello-world-app
+          docker push hello-truck
 
-      # Add steps for deployment (e.g., to localhost or cloud)
-      - name: Deploy
-        run: # Deployment commands here
+      - name: Upload CloudFormation Template to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks
+          bucket: ${{ secrets.S3_BUCKET_NAME }}
+          endpoint-url: ${{ secrets.S3_ENDPOINT_URL }}
+          path: /infrastructure/deployment-cft.yaml
+          source: ./infrastructure/deployment-cft.yaml
+
+      - name: Deploy CloudFormation Template
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: hello-truck-stack
+          template: ./infrastructure/deployment-cft.yaml
+          parameter-overrides: >-
+            DockerHubUsername=${{ secrets.DOCKER_USERNAME }}
+            DockerHubPassword=${{ secrets.DOCKER_PASSWORD }}
+            DockerImage=lakran/hello-truck:latest
+          capabilities: CAPABILITY_NAMED_IAM
+          no-fail-on-empty-changeset: '1'
