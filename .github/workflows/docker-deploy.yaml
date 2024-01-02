@@ -20,46 +20,11 @@ jobs:
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker push lakran/hello-truck
 
-      - name: Deploy CloudFormation Stack for S3 Bucket
-        id: deploy-s3-bucket
-        run: |
-          aws cloudformation deploy \
-            --template-file ./infrastructure/s3-bucket-template.yaml \
-            --stack-name my-s3-bucket-stack-1 \
-            --parameter-overrides BucketName=hello-truck-${{ github.run_id }} \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --no-fail-on-empty-changeset
-        env:
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      # Retrieve the output from the deployed CloudFormation stack
-      - name: Get S3 Bucket Name
-        id: get-bucket-name
-        run: |
-          BUCKET_NAME=$(aws cloudformation describe-stacks --stack-name my-s3-bucket-stack --query "Stacks[0].Outputs[?OutputKey=='BucketName'].OutputValue" --output text)
-          echo "S3 Bucket Name: $BUCKET_NAME"
-          echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
-        env:
-          AWS_REGION: us-east-1
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Upload CloudFormation Template to S3
-        run: |
-          aws s3 cp ./infrastructure/deployment-cft.yaml s3://hello-truck-${{ github.run_id }}/deployment-cft.yaml
-        env:
-          BUCKET_NAME: ${{ steps.deploy-s3-bucket.outputs.BucketName }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-
       - name: Deploy CloudFormation Template
         run: |
           aws cloudformation deploy \
-            --template-file ./infrastructure/deployment-cft.yaml \
-            --stack-name hello-truck-stack \
+            --template-file ./infrastructure/deployment-ecs.yaml \
+            --stack-name hello-truck-ecs \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset
         env:
