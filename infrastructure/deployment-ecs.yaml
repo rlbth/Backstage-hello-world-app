@@ -10,7 +10,7 @@ Parameters:
   DefaultSubnet1:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
     Type: String
-    Default: 	subnet-0c8c5845d50ce94f2
+    Default: subnet-0c8c5845d50ce94f2
 
   DefaultSubnet2:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
