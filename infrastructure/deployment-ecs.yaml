@@ -156,4 +156,52 @@ Resources:
                   - logs:*
                   - ec2:*
                 Resource: '*'
-
+  WebAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      DefaultAction:
+        Allow: {}
+      Scope: REGIONAL
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: helloTruckWebAcl
+        SampledRequestsEnabled: true
+      Rules:
+        - Name: BlockSQLInjection
+          Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            SqliMatchStatement:
+              FieldToMatch:
+                AllQueryArguments: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: NONE
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: SQLInjectionRule
+            SampledRequestsEnabled: true
+        - Name: BlockXSS
+          Priority: 2
+          Action:
+            Block: {}
+          Statement:
+            XssMatchStatement:
+              FieldToMatch:
+                AllQueryArguments: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: NONE
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: XSSRule
+            SampledRequestsEnabled: true
+    DependsOn: LoadBalancer
+    
+  WebACLAssociation:
+    Type: AWS::WAFv2::WebACLAssociation
+    Properties:
+      ResourceArn: !GetAtt LoadBalancer.LoadBalancerArn
+      WebACLArn: !GetAtt WebAcl.Arn
+   DependsOn: WebAcl 
