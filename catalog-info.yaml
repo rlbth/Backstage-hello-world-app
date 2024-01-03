@@ -6,9 +6,22 @@ metadata:
   annotations:
       github.com/project-slug: rlbth/Backstage-hello-world-app
       backstage.io/dockerfile: ./Dockerfile
-      backstage.io/techdocs-ref: url:./
+      backstage.io/techdocs-ref: ./mkdocs.yml
 spec:
   type: service
   lifecycle: experimental
   system: fleet-leasing
   owner: lakran
+  providesApis:
+    - hello-truck-api
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: hello-truck-api
+  description: "API for managing truck logistics."
+spec:
+  type: openapi
+  lifecycle: production
+  owner: lakran 
+  definition: ./api-spec/truck-api.yaml

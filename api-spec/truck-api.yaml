@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: Hello Truck API
+  version: 1.0.0
+  description: API for managing truck leasing fleet.
+
+paths:
+  /trucks:
+    get:
+      summary: List all trucks
+      responses:
+        '200':
+          description: A list of trucks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Truck'
+
+  /trucks/{truckId}:
+    get:
+      summary: Get details of a specific truck
+      parameters:
+        - name: truckId
+          in: path
+          required: true
+          description: Unique identifier of the truck
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Details of the truck
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Truck'
+        '404':
+          description: Truck not found
+
+    delete:
+      summary: Delete a truck
+      parameters:
+        - name: truckId
+          in: path
+          required: true
+          description: Unique identifier of the truck
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Truck deleted
+        '404':
+          description: Truck not found
+
+  /trucks:
+    post:
+      summary: Add a new truck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTruck'
+      responses:
+        '201':
+          description: Truck added
+
+components:
+  schemas:
+    Truck:
+      type: object
+      properties:
+        id:
+          type: string
+        model:
+          type: string
+        licensePlate:
+          type: string
+        status:
+          type: string
+          enum: [active, maintenance, retired]
+      required:
+        - id
+        - model
+        - licensePlate
+        - status
+
+    NewTruck:
+      type: object
+      properties:
+        model:
+          type: string
+        licensePlate:
+          type: string
+      required:
+        - model
+        - licensePlate
