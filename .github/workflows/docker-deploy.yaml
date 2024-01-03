@@ -1,14 +1,15 @@
-name: Docker Build and Deploy with CloudFormation
+name: BuildAndDeploy
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["LintAndTest"]
+    types: 
+      - completed
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v2
 
