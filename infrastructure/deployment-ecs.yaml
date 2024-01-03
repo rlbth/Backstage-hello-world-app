@@ -204,4 +204,4 @@ Resources:
     Properties:
       ResourceArn: !GetAtt LoadBalancer.LoadBalancerArn
       WebACLArn: !GetAtt WebAcl.Arn
-   DependsOn: WebAcl 
+     DependsOn: WebAcl 
