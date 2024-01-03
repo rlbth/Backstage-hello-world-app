@@ -25,6 +25,17 @@ These are located in three repositories, i.e,
 - rlbth/backstage
 - rlbth/backstage-hello-world
 
+### Hello Application Archectecture
+Hello world or Hello truck application is a simple python API application using Flask which a simple python framework for API programming. 
+Branching Strategy:  A long living main branch exists for the length of the application lifecycle with feature branches taken from the main branch from time to time for development, testing, sandboxes, etc. A rule of thumb with 14 day (one sprint) principle is followed to avoid merge conflicts from stale branches. 
+Docker and Docker Compose: Docker and docker-compose files are included for a manual, yet packaged deployment . They are located in the root of the directory and can be easily utilised with 'docker-compose up' or 'docker build . -t hello-world-app' like commands 
+Github Actions: GitHub actions are divided into two workflow files located in .github/workflow directory. The first, which is linting and testing is run on merging commits with main branch and the build/ deployment workflow is triggered upon successful completion of linting workflow. Build and deployment workflow are  fully automated with IaC written in CloudFormation templates, dockerized and deployed serverless with Fargate using Elastic Container Service. The workflow consideres existing VPC and security groups as parameters in infrastructure/cft.yml files. 
+Deployment on AWS: Cloud formation templates are written for deploying infrastructure as code, secretive information such as AWS access key id and secret access key are stored on gihub secrets. Secret exposure scanning and vulnerability scans are also enabled on every commit from which I get notified over the email. Cloudwatch was used for observability of the application. Some thought on security was also given for this application with WAF patterns to avoid cross site scripting and SQL Injection attacks, principle of least privilage was followed for security groups and IAM policies , roles for instance. It was an intension to have multiple lines of defence for the application. Cloudformation is used for observability but there are plenty of things that can be done to improvise the application stock ofcourse. 
+app-config.yml : this file is included in the root of the repository and describes the metadata of the application to configure with Backstage as a component. It includes dependencies, API documentation, etc. An Open AI specification was also included in the sample application.  
+
+
+## Conceptual plan to trigger CI/CD and AWS deployments from Backstage
+The idea is to create a template and register it in the Software catalog along with GitHub CDK files to easily bootstrap a new application with all the pipelines and secrity princoples baked in. The template can then be used to trigger building an application and deploying that application later to AWS.  CI/CD pinelines can also be monitored and triggred from the backstage application as needed.   
 
 ### Tech stack
 The overall techstack is as follows: 
@@ -46,8 +57,6 @@ For backstage deployment, I used:
 
 AWS services used for backstage deployment are as follows:
 - AWS Elastic Kubernetes Service for managed Kubernetes cluster 
-- AWS Elastic Container Registry for storing the docker image of backstage
-- AWS Relational Database Service for managed Posgtgres Database
 - AWS WAF - Web Application Firewall for securing against DDOS attacks etc 
 - AWS Fargate - For serveless deployment in the EKS cluster (Fargate Profile). 
 - AWS Application Load Balancer - for managing traffic to backstage 
@@ -104,13 +113,14 @@ yarn, npm, tox (python library), docker, git, python or pip, etc
 
 
 i. Building the Application
-Yarn Install: Command-line examples and configuration options.
-Yarn Test: Instructions on how to run tests.
-Yarn Build: Steps to build the application.
+Yarn Install: Command-line is used to install dependencies
+Yarn tsc: Will  create type definitions that will be consumed by the build
+Yarn build: Will build the application.
+Docker build : will build a image from the app  
 
 ii. Containerization with Docker
 Docker Build: npx is used to create backstage app, yarn dependencies are installed from lock file and then the docker image is built with Dockerfile provided
-Docker Hub: Docker username and password are stored in gitlab secrets and gitlab actions trigger push the image to docker hub
+Docker Hub: Docker username and password are stored in github secrets and gihub actions trigger push the image to docker hub
 
 iii. From code commit to release
 The idea is to write backstage template with github actions baked into it and add it to the software catalog to trigger initialisation to deployment as well as have minimal documentation included in readme.md of that template.
@@ -120,6 +130,7 @@ The idea is to write backstage template with github actions baked into it and ad
 Some challenges with the current setup and work to be done.
 - Deploying to EKS - cluster creation fails with CDKs
 - Origin 'http://localhost' is not allowed for GitHub OAuth.
+- Basic monitoring is setup, extensive monitoring work can be carried out 
 
 ### Common problems and troubleshooting
 Common issues and their resolutions.
