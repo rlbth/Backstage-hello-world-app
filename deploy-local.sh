@@ -13,4 +13,4 @@ docker stop $IMAGE_NAME-container
 docker rm $IMAGE_NAME-container
 
 # Run a new container with the latest image
-docker run -d --name $IMAGE_NAME-container -p 8080:8080 $IMAGE_NAME:latest
+docker run -d --name $IMAGE_NAME-container -p 5000:5000 $IMAGE_NAME:latest
