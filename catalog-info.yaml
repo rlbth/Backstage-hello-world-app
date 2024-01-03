@@ -4,7 +4,7 @@ metadata:
   name: hello-truck
   description: "A simple truck leasing hello world app"
   annotations:
-      backstage.io/github-actions-id: rlbth/Backstage-hello-world-app
+      github.com/project-slug: rlbth/Backstage-hello-world-app
       backstage.io/dockerfile: ./Dockerfile
       backstage.io/techdocs-ref: url:https://github.com/rlbth/Backstage-hello-world-app/blob/main/README.md
 spec:
