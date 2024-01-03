@@ -25,7 +25,15 @@ These are located in three repositories, i.e,
 - rlbth/backstage
 - rlbth/backstage-hello-world
 
-### Hello Application Archectecture
+The intension is to have a fully automated seamless deployment with minimal downtime, low RPO and RTO . Therefore every repo shall have its own workflows setup for CI and CD 
+- Repo 1 : Updates and builds the backstage app (that we get from npm create app ), package it and publish on docker hub with relevent tagging.
+- Repo 2 : Backstage infrastructure written in CDK - it basically builds CDK in python, synthesises CFTs and creates a stack through cloud formation for deploing EKS cluster and deploy kubernetes manifests for backstage namespace, secrets, service and deployment.
+- Repo 3 : Hello World or Hello Truck sample application that has all the components necessary to cohesively work with backstage.   
+
+![image](https://github.com/rlbth/Backstage-hello-world-app/assets/43711076/c976e9b8-6970-4e5b-99c5-e4516f53fe0e)
+
+
+### Hello Application Archictecture
 Hello world or Hello truck application is a simple python API application using Flask which a simple python framework for API programming. 
 - Branching Strategy:  A long living main branch exists for the length of the application lifecycle with feature branches taken from the main branch from time to time for development, testing, sandboxes, etc. A rule of thumb with 14 day (one sprint) principle is followed to avoid merge conflicts from stale branches. 
 - Docker and Docker Compose: Docker and docker-compose files are included for a manual, yet packaged deployment . They are located in the root of the directory and can be easily utilised with 'docker-compose up' or 'docker build . -t hello-world-app' like commands 
@@ -33,6 +41,9 @@ Hello world or Hello truck application is a simple python API application using 
 - Deployment on AWS: Cloud formation templates are written for deploying infrastructure as code, secretive information such as AWS access key id and secret access key are stored on gihub secrets. Secret exposure scanning and vulnerability scans are also enabled on every commit from which I get notified over the email. Cloudwatch was used for observability of the application. Some thought on security was also given for this application with WAF patterns to avoid cross site scripting and SQL Injection attacks, principle of least privilage was followed for security groups and IAM policies , roles for instance. It was an intension to have multiple lines of defence for the application. Cloudformation is used for observability but there are plenty of things that can be done to improvise the application stock ofcourse. 
 - app-config.yml : this file is included in the root of the repository and describes the metadata of the application to configure with Backstage as a component. It includes dependencies, API documentation, etc. An Open AI specification was also included in the sample application. Annotations are used to enable CI/CD, techdocks, service information etc. These can be tweaked as well.  
 
+Infrastructure Design: 
+
+![Backstage architecture drawio](https://github.com/rlbth/Backstage-hello-world-app/assets/43711076/60012bf4-adc4-4b48-ac4e-6b8860fa694d)
 
 ## Conceptual plan to trigger CI/CD and AWS deployments from Backstage
 The idea is to create a template and register it in the Software catalog along with GitHub CDK files to easily bootstrap a new application with all the pipelines and secrity princoples baked in. The template can then be used to trigger building an application and deploying that application later to AWS.  CI/CD pinelines can also be monitored and triggred from the backstage application as needed.   
@@ -78,10 +89,8 @@ AWS services used for hello-world deployment are as follows:
 - AWS CFT is used for deployment
 - AWS ElasticBeanStalk which is a managed service for running docker applications was used.
 
-
-Deployment strategy used for hello-world-application - Blue Green Deployment 
-
-
+Target deployment strategies: Blue green deployment for hello-world app and rolling upgrades for backstage service.
+Why? - Hello world app has an experimentation need while backstage has a stability need.
 
 ### Priliminary implementation
 
@@ -130,7 +139,8 @@ The idea is to write backstage template with github actions baked into it and ad
 Some challenges with the current setup and work to be done.
 - Deploying to EKS - cluster creation fails with CDKs
 - Origin 'http://localhost' is not allowed for GitHub OAuth.
-- Basic monitoring is setup, extensive monitoring work can be carried out 
+- Basic monitoring is setup, extensive monitoring work can be carried out
+- Not many ansible compoenents available to configure backstage, so we need to custom write the modules or write scripts. 
 
 ### Common problems and troubleshooting
 Common issues and their resolutions.
