@@ -119,6 +119,7 @@ The idea is to write backstage template with github actions baked into it and ad
 ### Challenges
 Some challenges with the current setup and work to be done.
 - Deploying to EKS - cluster creation fails with CDKs
+- Origin 'http://localhost' is not allowed for GitHub OAuth.
 
 ### Common problems and troubleshooting
 Common issues and their resolutions.
