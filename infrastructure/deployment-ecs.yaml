@@ -5,17 +5,17 @@ Parameters:
   DefaultVpcId:
     Description: To use existing VPC ID, since VPC creation is not allowd in sandboxes
     Type: String
-    Default: vpc-0696601040a7e7e0a
+    Default: vpc-0ae42f4888a900b0f
 
   DefaultSubnet1:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
     Type: String
-    Default: subnet-0ce9456454cc66258
+    Default: subnet-03e0b91b2ac696fd5
 
   DefaultSubnet2:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
     Type: String
-    Default: subnet-0aa799403c85ce3ec
+    Default: subnet-0609b8a74e5ed452a
 
 
 Resources:
@@ -108,7 +108,7 @@ Resources:
             LogDriver: awslogs
             Options:
               awslogs-group: /ecs/hello-truck
-              awslogs-region: us-east-1
+              awslogs-region: eu-west-1
               awslogs-stream-prefix: ecs
 
   ECSService:
