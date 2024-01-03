@@ -1,0 +1,4 @@
+site_name: hello-truck-docsite
+nav:
+    - Home:  README.md
+theme: material
