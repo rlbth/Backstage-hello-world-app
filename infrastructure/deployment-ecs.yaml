@@ -5,17 +5,17 @@ Parameters:
   DefaultVpcId:
     Description: To use existing VPC ID, since VPC creation is not allowd in sandboxes
     Type: String
-    Default: vpc-012cddeb4a4e46a25
+    Default: vpc-0a009c8fa1acdc54f
 
   DefaultSubnet1:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
     Type: String
-    Default: subnet-0c8c5845d50ce94f2
+    Default: subnet-0cc568c0adef67a7f
 
   DefaultSubnet2:
     Description: To use existing Subnet ID, since Subnet creation is not allowd in sandboxes
     Type: String
-    Default: subnet-037d17305f596c947
+    Default: subnet-044aca3cbaa095fb6
 
 
 Resources:
