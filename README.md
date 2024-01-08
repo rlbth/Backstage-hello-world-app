@@ -2,9 +2,21 @@
 [![Docker Build and Deploy with CloudFormation](https://github.com/rlbth/Backstage-hello-world-app/actions/workflows/docker-deploy.yaml/badge.svg?branch=main)](https://github.com/rlbth/Backstage-hello-world-app/actions/workflows/docker-deploy.yaml)
 # Application Integration with Backstage
 
-This document contains the paper solution (concept) and blue print for priliminary implimentation involved in the automated build, test, and deployment of our "hello-world" app through backstage.
+This documentation contains the concept and blue print for priliminary implimentation involved in the automated build, test, and deployment of our "hello-world" app through backstage. Setting up backstage service and infrastructure are included in seperate repositories.
 The application is managed through Backstage and integrates with various services such as AWS, Docker, and GitHub.
 
+## How to run the application
+- Manual way (local): use ```docker-compose up -d ``` command and access localhost:5000/trucks or 127.0.0.1:5000/trucks from your browser
+- Automated way (AWS) : Edit infrastructure/deployment-ecs.yaml, change the 'Default: vpc-0a009c8fa1acdc54f' to your VPC id on AWS and subnet1 and subnet2 ids to your public subnets.  The vpc needs to have two public subnets and traffic routed through internet gateway.
+- Note 1: The deployment assumes that you are in US-EAST-1 region, if you would like to change that, you can change .gihub/workflows/docker-deploy.yaml AWS_REGION env parameter in 'Deploy CloudFormation Template' step to your region.
+- Note 2: AWS Access Key Id (AWS_ACCESS_KEY_ID), Secret Access Key(AWS_SECRET_ACCESS_KEY), DockerHub Username (DOCKER_USERNAME) and Password (DOCKER_PASSWORD) are to be given in github secrets when you fork the repository.
+
+## Examples to Interact with the application
+The application has two API methods a GET method to list all trucks and a POST method to insert a new truk.
+- List all trucks : ``` curl -X GET "http://localhost:5000/trucks" -H "accept: application/json" ```
+- Insert a new truck : ```curl -X POST "http://localhost:5000/trucks" -H "Content-Type: application/json" -d '{"make": "Scania", "model": "V8"}' ```
+- In case of remote deployment, replace localhost:5000 to an endpoint of the deployment in AWS.
+  
 ## Contents of the documentation:
 
 - Overall Flow 
