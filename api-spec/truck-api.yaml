@@ -53,7 +53,7 @@ paths:
         '404':
           description: Truck not found
 
-  /trucks:
+  /trucks/:
     post:
       summary: Add a new truck
       requestBody:
